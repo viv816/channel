@@ -1,0 +1,151 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core">
+	
+  <ui:composition template="/userlayout.xhtml">
+ 	<ui:define name="title">Users</ui:define>
+ 	<ui:define name="content">
+ 	<table>
+        <tr>
+          	<td>
+ 	 			<!-- <span style="color: grey;" >SY0401</span> -->
+ 			</td>
+        </tr>
+        
+        <tr>      
+	      	 <td>
+				<h1>ADD USERS</h1>
+			 </td>
+ 		</tr>
+ 	</table> 
+ 	
+ 	 <h:form>
+ 	 	<p:commandButton value="Add New" ajax="false" actionListener="#{usersManagedBean.showDailogue}"  update=":newUserForm" />
+ 	 </h:form>
+ 	 <br/><br/>
+	<h:form id="userTableForm">
+	<p:messages autoUpdate="true" globalOnly="true"/>
+        <p:dataTable id="userTable" widgetVar="usersTable" rowIndexVar="rowIndex"  var="user" value="#{usersManagedBean.usersDataModel}" rowKey="#{user.id}"
+                 selection="#{usersManagedBean.selectedUser}" selectionMode="single" 
+                 rows="20" paginator="true" paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  {RowsPerPageDropdown}" rowsPerPageTemplate="20,50,100" >
+          <p:ajax event="rowSelect" listener="#{usersManagedBean.onRowSelect}"  update=":userDetailForm:display, :growl" />  
+		       <p:column width="3%" headerText="S.No" resizable="true"
+								style="text-align:center">
+								<f:facet name="header">
+										<h:outputText value="S.No"/>
+				                <div class="empty"></div>
+	           				 </f:facet>
+							<h:outputText value="#{rowIndex+1}" />
+				</p:column>
+	      
+	          	<p:column width="8%" id="nameHeader" headerText="Username" sortBy="#{user.username}">
+	         		   		 <h:outputText value="#{user.username}" />
+	         	 </p:column>
+               <p:column width="8%" id="cnameHeader" sortBy="#{user.cnameDesc}">
+	               <f:facet name="header"> Department </f:facet> 
+	               <h:outputText value="#{user.cnameDesc}" />
+               </p:column>
+	     		<p:column width="10%" id="statusHeader" resizable="true"
+						style="text-align:center" sortBy="#{user.enabled}" filterBy="#{user.enabled}" filterStyle="display:none">
+						<f:facet name="header">Status </f:facet>
+						<h:outputText
+							value="#{user.enabled eq true ? 'Active' : 'InActive'}" style="align:center"/>
+	  			</p:column>
+	  	<p:column width="10%" id="servicelink" resizable="true" style="text-align:center">
+			<f:facet name="header"> Services </f:facet>
+			<h:outputText value="View" id="see" style="color:blue;text-decoration:underline"/>
+  		  	<p:overlayPanel id="imgPanel" for="see"  hideEffect="explode" showEvent="mouseover" hideEvent="mouseout"
+                    dismissable="false" showCloseIcon="false">
+                    <h:outputLabel value="Service Code" style="font-weight:bold"/>,<h:outputLabel value="Service Name" style="font-weight:bold" />
+                  <p:dataList value="#{usersManagedBean.getServiceListBy(user.username)}" var="service" type="ordered">
+       						#{service.serviceCode}, #{service.serviceName}
+    					  </p:dataList>
+   			 </p:overlayPanel>
+    	</p:column>
+       </p:dataTable>
+    </h:form>
+    <br/>
+    <p:growl id="growl" life="1000"/> 
+ 	 		
+ 	    <p:dialog header="Update User Details" styleClass="dlgCSS"  widgetVar="userDialog" resizable="false" id="userDlg" modal ="true">
+               <h:form id="userDetailForm">
+               <p:messages autoUpdate="true"/>
+                <p:panelGrid id="display" columns="2" cellpadding="4" style="margin:0 auto;">
+                	<h:outputText value="User Name :"></h:outputText>	
+                    	<h:outputText value="#{usersManagedBean.selectedUser.username}" />
+            		<h:outputText value="Department :"></h:outputText>	
+                    	<h:outputText value="#{usersManagedBean.selectedUser.cnameDesc}" />
+            		<h:outputText value="User Role :"></h:outputText>	
+                       <h:outputText value="#{usersManagedBean.selectedUser.userRole}"></h:outputText>	
+                    	
+                    	<h:outputText value="Assign Services :"></h:outputText>
+                      	<p:pickList id="servicePickList" value="#{usersManagedBean.dualServiceList}"
+	          				var="service0" converter="servicePickListConverter" itemValue="#{service0}" itemLabel="#{service0.description}" >
+	          	 			<f:facet name="sourceCaption">Available Services</f:facet>  
+	        				<f:facet name="targetCaption">Assigned Services</f:facet>  
+          				</p:pickList>
+          				  <h:outputText value="Status"></h:outputText>
+						<p:selectOneMenu
+							value="#{usersManagedBean.selectedUser.enabled}"
+							required="true" requiredMessage="Please Enter  Status">
+							<f:selectItem itemLabel="Active" itemValue="true" />
+							<f:selectItem itemLabel="InActive" itemValue="false" />
+						</p:selectOneMenu> 
+                    <f:facet name="footer">
+                    </f:facet>
+                </p:panelGrid>
+             </h:form>
+      </p:dialog>
+          
+      <p:dialog header="Add New User" styleClass="dlgCSS" widgetVar="newUserDialog" resizable="false" id="newUserDlg"  modal ="true">
+              <h:form id="newUserForm">
+              <p:messages autoUpdate="true"/>
+                <p:panelGrid id="displayNewUser" columns="2" cellpadding="4" style="margin:0 auto;">
+                	
+            		<h:outputText value="Username :"></h:outputText>
+                        <p:focus><p:inputText value="#{usersManagedBean.newUser.username}" required="true" requiredMessage="Please Enter Username!" label="Username "> <f:validateLength minimum="4" maximum="30"/></p:inputText> </p:focus>
+            		<h:outputText value="Password :"></h:outputText>	
+            			<p:password id="pwd1" value="#{usersManagedBean.newUser.password}"   required="true" requiredMessage="Please Enter Password!" label="Password "> <f:validateLength minimum="4" maximum="10"/></p:password>  
+            		<h:outputText value="Department :"></h:outputText>	
+                    	<p:inputText value="#{usersManagedBean.newUser.cnameDesc}" required="true" requiredMessage="Please Enter Department Name!" >  <f:validateLength minimum="4" maximum="30"/></p:inputText>
+            		<h:outputText value="User Role :"></h:outputText>	
+                    	 <p:selectOneMenu id="userRole" value="#{usersManagedBean.newUser.userRole}" style="width:125px" required="true" requiredMessage="Please Select Role!">
+           					 <f:selectItem itemLabel="Select One" itemValue="" />
+            				 <f:selectItem itemLabel="SYSTEM_ADMIN" itemValue="SYSTEM_ADMIN" />
+            				<f:selectItem itemLabel="BUSINESS_USER" itemValue="BUSINESS_USER" />
+            			</p:selectOneMenu>
+                    
+            			<h:outputText value="Assign Services :"></h:outputText>
+                      	<p:pickList id="servicePickList" value="#{usersManagedBean.dualServiceList}"
+	          				var="service0" converter="servicePickListConverter" itemValue="#{service0}" itemLabel="#{service0.description}" >
+	          				<f:facet name="sourceCaption"> Available Services</f:facet>  
+	        				<f:facet name="targetCaption">Assigned Services</f:facet>  
+          				</p:pickList>
+          				 <h:outputText value="Status"></h:outputText>
+						<p:selectOneMenu
+							value="#{usersManagedBean.newUser.enabled}"
+							required="true" requiredMessage="Please Enter  Status">
+							<f:selectItem itemLabel="Active" itemValue="true" />
+							<f:selectItem itemLabel="InActive" itemValue="false" />
+						</p:selectOneMenu> 
+                    	<f:facet name="footer">
+                            <p:commandButton value="Submit" update=":userTableForm:userTable"  oncomplete="if(!args.validationFailed) PF('newUserDialog').hide()" validateClient="true" actionListener="#{usersManagedBean.doCreateUser}"/>
+                            <p:commandButton value="Cancel" oncomplete="PF('newUserDialog').hide()"></p:commandButton>
+                    	</f:facet>
+                </p:panelGrid>
+              </h:form>
+      </p:dialog>
+          
+          <p:confirmDialog message="Are you sure?" header="Deleting User" 
+          	severity="alert" widgetVar="cd">	
+			<h:form>
+			<p:commandButton value="No" onclick="PF('cd').hide();PF('userDialog').show();" type="button" />
+			</h:form>
+			</p:confirmDialog>
+		</ui:define>
+		</ui:composition>
+		<br/><br/>
+</ui:composition>

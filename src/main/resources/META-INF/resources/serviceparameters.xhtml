@@ -1,0 +1,120 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core"
+    xmlns:pe="http://primefaces.org/ui/extensions" >
+   
+ <h:head>
+	    <title>Services  Parameters  </title>
+          <meta http-equiv="X-UA-Compatible" content="IE=8" />
+</h:head>
+	 
+    	<ui:composition template="/userlayout.xhtml">
+ 	<ui:define name="title">Services  Parameters  Management</ui:define>
+ 	<ui:define name="content">
+ 	<table>
+        <tr>
+          	<td>
+ 	 			<!-- <span style="color: grey;" >SY01</span> -->
+ 			</td>
+        </tr>
+        
+        <tr>      
+	      	 <td>
+				<h1>Add Services</h1>
+			 </td>
+ 		</tr>
+ 	</table> 
+	
+         <h:form id="commandButtonForm">
+	       <p:commandButton value="Add New Service" ajax="false" actionListener="#{serviceParameterManagedBean.showDailogue}"  update=":newSystemParametersForm" />
+	   </h:form>   
+        <br/>
+		<h:form id="systemParametersTableForm">	
+		<p:messages autoUpdate="true"  globalOnly="true"/>
+        <p:dataTable id="systemParameterTable"    var="systemParameters0" value="#{serviceParameterManagedBean.systemParametersDataModel}" widgetVar="systemParameterSearch" rowKey="#{systemParameters0.id}"
+                 								 scrollable="true" selectionMode="single" emptyMessage="No data found with given criteria" 
+                 						 paginator="true" rows="20" 	paginatorPosition="bottom" paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}  {RowsPerPageDropdown}" rowsPerPageTemplate="20,50,100">
+       
+     	<p:ajax event="rowSelect" listener="#{serviceParameterManagedBean.onRowSelect}" update=":systemParameterDetailForm:display, :growl" />
+        
+        <p:column width="15%" id="propertyNameHeader"  sortBy="#{systemParameters0.serviceName}"><f:facet name="header" > Service Name</f:facet><h:outputText value="#{systemParameters0.serviceName}" style="align:center" /></p:column>
+        <p:column width="15%" headerText="Parameter Value" sortBy="#{systemParameters0.serviceCode}"><f:facet name="header"> Service Value</f:facet><h:outputText value="#{systemParameters0.serviceCode}" style="align:center"/></p:column>
+        <p:column width="15%" id="descHeader"  sortBy="#{systemParameters0.description}" ><f:facet name="header"> Description</f:facet><h:outputText value="#{systemParameters0.description}" style="align:center"/></p:column>
+       
+       <p:column width="10%" id="statusHeader" resizable="true"
+						style="text-align:center" sortBy="#{systemParameters0.active}" filterBy="#{systemParameters0.active}" filterStyle="display:none">
+						<f:facet name="header">Status </f:facet>
+						<h:outputText
+							value="#{systemParameters0.active eq true ? 'Active' : 'InActive'}" style="align:center"/>
+	  </p:column>
+	 
+  
+   </p:dataTable>
+   </h:form>
+   <p:growl id="growl"  life="1000"/> 
+  </ui:define>
+    <ui:define name="dialog">
+      <p:dialog header="Update Services Parameter Details " styleClass="dlgCSS" widgetVar="systemParameterDialog" resizable="false" id="systemParameterDialog" modal="true" >
+          <h:form id="systemParameterDetailForm">
+          <p:messages  autoUpdate="true"/>
+               <p:panelGrid id="display" columns="2" cellpadding="4" style="margin:0 auto;">
+           			 <h:outputText value="Service Name :" ></h:outputText>
+                     <h:inputText value="#{serviceParameterManagedBean.selectedSystemParameters.serviceName}" required="true" requiredMessage="Please Enter Property Name!" label="Property Name " ></h:inputText>
+           			 <h:outputText value="Service Code :"></h:outputText>
+            		 <h:inputTextarea rows="6" cols="33"  value="#{serviceParameterManagedBean.selectedSystemParameters.serviceCode}" required="true" requiredMessage="Please Enter Property Value!" label="Property Value"></h:inputTextarea>
+                      <h:outputText value="Description :"></h:outputText>
+                      <h:inputTextarea  rows="6" cols="33" value="#{serviceParameterManagedBean.selectedSystemParameters.description}" required="true" requiredMessage="please Enter Description" label="Description "></h:inputTextarea>
+                       <h:outputText value="Status" styleClass="redasterisk"></h:outputText>
+						<p:selectOneMenu
+							value="#{serviceParameterManagedBean.selectedSystemParameters.active}"
+							required="true" requiredMessage="Please Enter  Status"
+							label="Status ">
+							<f:selectItem itemLabel="Active" itemValue="true" />
+							<f:selectItem itemLabel="InActive" itemValue="false" />
+
+						</p:selectOneMenu>      
+                     <f:facet name="footer">
+                            <p:commandButton value="Update" update=":systemParametersTableForm:systemParameterTable"  oncomplete="if(!args.validationFailed)  PF('systemParameterDialog').hide()" validateClient="true" actionListener="#{serviceParameterManagedBean.doUpdateSystemParameter}"/>
+                            <p:commandButton value="Delete"  onclick="PF('cd').show()" oncomplete="PF('systemParameterDialog').hide()"/>                        
+                    </f:facet>
+              </p:panelGrid>
+          </h:form>
+      </p:dialog>
+      <p:dialog header="Add New Services Parameters" widgetVar="newSystemParametersDialog" resizable="false" id="newSystemParemetersDlg" modal="true">
+         <h:form id="newSystemParametersForm">
+         <p:messages autoUpdate="true" infoStyle="color:darkgreen" errorStyle="color:darkred" />
+           <p:panelGrid id="displayNewSystemParameters" columns="2" cellpadding="4" style="margin:0 auto;">
+            		
+			<h:outputText value="Service Name :" ></h:outputText>
+            <p:inputText  id="pname" value="#{serviceParameterManagedBean.newSystemParameters.serviceName}" required="true" requiredMessage="Please Enter Property Name!" label="Property Name "></p:inputText>
+			<h:outputText value="Service Code :"></h:outputText>
+            <p:inputTextarea rows="6" cols="33" value="#{serviceParameterManagedBean.newSystemParameters.serviceCode}" required="true" requiredMessage="Please Enter Property Value!" label="Property Value "></p:inputTextarea>
+            
+            <h:outputText value="Description :" ></h:outputText>           
+			<p:inputTextarea  rows="6" cols="33" value="#{serviceParameterManagedBean.newSystemParameters.description}" required="true" requiredMessage="please Enter Description" label="Description " ></p:inputTextarea>
+		     <h:outputText value="Status" styleClass="redasterisk"></h:outputText>
+						<p:selectOneMenu value="#{serviceParameterManagedBean.newSystemParameters.active}"
+							required="true" requiredMessage="please Enter  Status"
+							label="Status ">
+							<f:selectItem itemLabel="Active" itemValue="true" />
+							<f:selectItem itemLabel="Inactive" itemValue="false" />
+						</p:selectOneMenu>
+			<f:facet name="footer">
+                            <p:commandButton value="Submit" update=":systemParametersTableForm:systemParameterTable"  oncomplete="if(!args.validationFailed) PF('newSystemParametersDialog').hide()" validateClient="true" actionListener="#{serviceParameterManagedBean.doCreateSystemParameter}"/>
+                             <p:commandButton value="Cancel" oncomplete="PF('newSystemParametersDialog').hide()"></p:commandButton>
+                    </f:facet>
+         </p:panelGrid>
+       </h:form>
+   </p:dialog>
+    <p:confirmDialog message="Are you sure?" header="Deleting Services Parameter" severity="alert" widgetVar="cd">	
+		<h:form>
+			<p:commandButton value="Yes" actionListener="#{serviceParameterManagedBean.doDeleteSystemParameter}" update=":systemParametersTableForm:systemParameterTable" oncomplete="PF('cd').hide();"/>
+			<p:commandButton value="No" onclick="PF('cd').hide();PF('systemParameterDialog').show();" type="button" />
+		</h:form>			
+	  </p:confirmDialog>
+   </ui:define>
+  	</ui:composition>
+</ui:composition>

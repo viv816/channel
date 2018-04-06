@@ -1,0 +1,24 @@
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://java.sun.com/jsf/html"
+    xmlns:f="http://java.sun.com/jsf/core"
+    xmlns:ui="http://java.sun.com/jsf/facelets"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:c="http://java.sun.com/jsp/jstl/core">
+ 
+<div style="margin-top:20px;">
+	<h:form>
+		<p:growl id="messages" />
+		<!-- Need to add authorization based on role here -->
+		  <p:menubar toggleable="true">
+			<p:menuitem value="Home" url="/admin/adminhomepage.jsf" />			
+			<p:submenu style="margin-left: 10px;" label="Settings" >
+			 <p:menuitem value="Services Parameters" url="/serviceparameters.jsf" />
+			 <p:menuitem value="Add Users" url="/user.jsf" />
+			 
+			</p:submenu>
+		</p:menubar>
+	</h:form>
+</div>
+
+</ui:composition>
